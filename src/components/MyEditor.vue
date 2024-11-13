@@ -13,6 +13,8 @@
       :mode="mode"
       @onCreated="onCreated"
     />
+
+    <el-button type="primary" @click="newsAdd"> 保存 </el-button>
   </div>
 </template>
 
@@ -28,12 +30,37 @@ export default Vue.extend({
       html: '<p>hello</p>',
       toolbarConfig: {},
       editorConfig: { placeholder: '请输入内容...' },
-      mode: 'default' // or 'simple'
+      mode: 'default', // or 'simple'
+      // 添加文章的表单数据
+      addNewsForm: {
+        primaryTitle: '1',
+        subtitle: '1',
+        keywords: '1',
+        publicScope: '1',
+        publishSource: '1',
+        publishTime: '2024-11-13',
+        firstClass: '',
+        secondClass: ''
+      }
     }
   },
   methods: {
     onCreated(editor) {
       this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
+    },
+    // 新增文章
+    async newsAdd() {
+      const params = {
+        ...this.addNewsForm,
+        content: this.html
+      }
+      // 发起添加文章网络请求
+      const { data: res } = await this.$http.post('add', params)
+      console.log(res)
+      //   if (res.meta.status !== 201) {
+      //     return this.$message.error('添加用户失败.')
+      //   }
+      //   this.$message.success('添加用户成功.')
     }
   },
   mounted() {

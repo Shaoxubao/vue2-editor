@@ -1,18 +1,12 @@
 <template>
   <div id="app">
-    <p>hello</p>
-    <MyEditor />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import MyEditor from './components/MyEditor.vue'
-
 export default {
-  name: 'App',
-  components: {
-    MyEditor
-  }
+  name: 'App'
 }
 </script>
 <style>
