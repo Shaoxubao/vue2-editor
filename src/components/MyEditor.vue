@@ -1,20 +1,89 @@
 <template>
-  <div style="border: 1px solid #ccc">
-    <Toolbar
-      style="border-bottom: 1px solid #ccc"
-      :editor="editor"
-      :defaultConfig="toolbarConfig"
-      :mode="mode"
-    />
-    <Editor
-      style="height: 500px; overflow-y: hidden"
-      v-model="html"
-      :defaultConfig="editorConfig"
-      :mode="mode"
-      @onCreated="onCreated"
-    />
-
-    <el-button type="primary" @click="newsAdd"> 保存 </el-button>
+  <div>
+    <el-form ref="addNewsForm" :model="addNewsForm" class="qk-form">
+      <el-row>
+        <el-col :span="8">
+          <el-form-item label="一级标题:" prop="primaryTitle">
+            <el-input
+              :disabled="isDisabled"
+              class="qk-input"
+              v-model="addNewsForm.primaryTitle"
+              placeholder="请输入内容"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="二级标题:" prop="subtitle">
+            <el-input
+              :disabled="isDisabled"
+              class="qk-input"
+              v-model="addNewsForm.subtitle"
+              placeholder="请输入内容"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="关键词:" prop="keywords">
+            <el-input
+              :disabled="isDisabled"
+              class="qk-input"
+              v-model="addNewsForm.keywords"
+              placeholder="请输入内容"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="8">
+          <el-form-item label="文章分类:">
+            <el-select
+              v-model="addNewsForm.firstClass"
+              prop="firstClass"
+              placeholder="请选择分类"
+            >
+              <el-option label="Java" value="1"></el-option>
+              <el-option label="C++" value="2"></el-option>
+              <el-option label="Go" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="发布时间:" prop="publishTime">
+            <el-input
+              :disabled="isDisabled"
+              class="qk-input"
+              v-model="addNewsForm.publishTime"
+              placeholder="请输入内容"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <div style="border: 1px solid #ccc">
+      <Toolbar
+        style="border-bottom: 1px solid #ccc"
+        :editor="editor"
+        :defaultConfig="toolbarConfig"
+        :mode="mode"
+      />
+      <Editor
+        style="height: 500px; overflow-y: hidden"
+        v-model="html"
+        :defaultConfig="editorConfig"
+        :mode="mode"
+        @onCreated="onCreated"
+      />
+    </div>
+    <div></div>
+    <div class="saveNewsButton">
+      <!-- <el-button type="primary" @click="newsAdd"> 确认保存 </el-button> -->
+      <el-form>
+        <el-form-item>
+          <el-button type="primary" @click="newsAdd">保存</el-button>
+          <el-button type="info" @click="backToLlist">返回</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -27,21 +96,22 @@ export default Vue.extend({
   data() {
     return {
       editor: null, // 实例对象
-      html: '<p>hello</p>',
+      html: '',
       toolbarConfig: {},
       editorConfig: { placeholder: '请输入内容...' },
       mode: 'default', // or 'simple'
       // 添加文章的表单数据
       addNewsForm: {
-        primaryTitle: '1',
-        subtitle: '1',
-        keywords: '1',
-        publicScope: '1',
-        publishSource: '1',
-        publishTime: '2024-11-13',
+        primaryTitle: '',
+        subtitle: '',
+        keywords: '',
+        publicScope: '',
+        publishSource: '',
+        publishTime: '',
         firstClass: '',
         secondClass: ''
-      }
+      },
+      isDisabled: false
     }
   },
   methods: {
@@ -57,16 +127,23 @@ export default Vue.extend({
       // 发起添加文章网络请求
       const { data: res } = await this.$http.post('add', params)
       console.log(res)
-      //   if (res.meta.status !== 201) {
-      //     return this.$message.error('添加用户失败.')
-      //   }
-      //   this.$message.success('添加用户成功.')
+      if (res.code === 200) {
+        this.$message.success('添加文章成功.')
+        // 跳转回列表
+        this.$router.push({ path: '/news' })
+      } else {
+        this.$message.error('添加文章失败.')
+      }
+    },
+    backToLlist() {
+      // 跳转回列表 或者 this.$router.push({ name: 'news' })
+      this.$router.push({ path: '/news' })
     }
   },
   mounted() {
     // 模拟 ajax 请求，异步渲染编辑器
     setTimeout(() => {
-      this.html = '<p>模拟 Ajax 异步设置内容 HTML</p>'
+      this.html = ''
     }, 1500)
   },
   beforeDestroy() {
@@ -78,3 +155,20 @@ export default Vue.extend({
 </script>
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
+<style lang="less" scoped>
+.saveNewsButton {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  margin-top: 20px;
+  margin-right: 50px;
+}
+span[data-slate-node='text'] {
+  display: inline-block;
+  width: 100%;
+}
+
+.qk-input {
+  width: 30%;
+}
+</style>
