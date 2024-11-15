@@ -26,6 +26,7 @@
               type="primary"
               icon="el-icon-view"
               size="mini"
+              @click="newsDetail(scope.row.id)"
             ></el-button>
             <el-button
               type="warning"
@@ -112,6 +113,10 @@ export default {
       // console.log(newPage)
       this.queryInfo.pageNum = newPage
       this.getNewsList()
+    },
+    // 文章详情
+    newsDetail(id) {
+      this.$router.push({ path: '/newsDetail', query: { id: id } })
     }
   }
 }
