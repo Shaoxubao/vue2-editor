@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="addNewsBody">
     <el-form ref="addNewsForm" :model="addNewsForm" class="qk-form">
       <el-row>
         <el-col :span="8">
@@ -49,12 +49,13 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="发布时间:" prop="publishTime">
-            <el-input
-              :disabled="isDisabled"
-              class="qk-input"
+            <el-date-picker
               v-model="addNewsForm.publishTime"
-              placeholder="请输入内容"
-            ></el-input>
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="选择日期"
+            >
+            </el-date-picker>
           </el-form-item>
         </el-col>
       </el-row>
@@ -124,9 +125,9 @@ export default Vue.extend({
         ...this.addNewsForm,
         content: this.html
       }
+      console.log(params)
       // 发起添加文章网络请求
       const { data: res } = await this.$http.post('add', params)
-      console.log(res)
       if (res.code === 200) {
         this.$message.success('添加文章成功.')
         // 跳转回列表
@@ -170,5 +171,10 @@ span[data-slate-node='text'] {
 
 .qk-input {
   width: 30%;
+}
+
+.addNewsBody {
+  margin-top: 2px;
+  background-color: #e1c3dc;
 }
 </style>

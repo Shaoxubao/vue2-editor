@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="news-body">
     <!--卡片试图区域-->
     <el-card class="box-card">
       <!--文章列表区域-->
@@ -36,6 +36,17 @@
           </template>
         </el-table-column>
       </el-table>
+      <!--分页区域-->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="this.queryInfo.pageNum"
+        :page-sizes="[1, 2, 5, 10]"
+        :page-size="this.queryInfo.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="this.total"
+      >
+      </el-pagination>
     </el-card>
     <div><el-button type="primary" @click="backHome">返回主页</el-button></div>
   </div>
@@ -45,7 +56,15 @@
 export default {
   data() {
     return {
-      newsList: []
+      // 获取文章列表的参数对象
+      queryInfo: {
+        pageNum: 1,
+        pageSize: 5
+      },
+      // 文章列表
+      newsList: [],
+      // 总数
+      total: 0
     }
   },
   created() {
@@ -53,15 +72,13 @@ export default {
   },
   methods: {
     async getNewsList() {
-      const params = {
-        pageNum: 1,
-        pageSize: 10
-      }
+      const params = this.queryInfo
       // 发起查询文章列表网络请求
       const { data: res } = await this.$http.post('list', params)
       console.log(res)
       if (res.code === 200) {
         this.newsList = res.data.list
+        this.total = res.data.total
         return
       }
       this.$message.error('查询文章列表失败.')
@@ -83,6 +100,18 @@ export default {
     backHome() {
       // 跳转回主页
       this.$router.push({ path: '/login' })
+    },
+    // 监听 pagesize 改变的事件
+    handleSizeChange(newSize) {
+      // console.log(newSize)
+      this.queryInfo.pageSize = newSize
+      this.getNewsList()
+    },
+    // 监听 页码值 改变的事件
+    handleCurrentChange(newPage) {
+      // console.log(newPage)
+      this.queryInfo.pageNum = newPage
+      this.getNewsList()
     }
   }
 }
@@ -90,7 +119,7 @@ export default {
 
 <style lang="less" scoped>
 .box-card {
-  height: 100%;
+  height: 700px;
   background-color: aqua;
 }
 </style>
